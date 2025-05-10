@@ -1,5 +1,5 @@
 <template>
-	<div class="h-dvh w-dvw p-8">
+	<div class="h-dvh w-dvw">
 		<slot />
 	</div>
 </template>
