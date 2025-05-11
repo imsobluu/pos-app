@@ -37,13 +37,14 @@ const selectedMenuItem = ref<MenuItem | null>();
 const count = ref(1);
 
 function increaseOrDecreaseCounter(type: "increase" | "decrease") {
-    if (type === "increase") {
-    	count.value++;
-    } else {
-    	if (count.value > 1) {
-    		count.value--;
-    	}
-    }
+	if (type === "increase") {
+		count.value++;
+	}
+	else {
+		if (count.value > 1) {
+			count.value--;
+		}
+	}
 }
 
 function openMenuItemDialog(item: MenuItem) {
@@ -190,18 +191,21 @@ const { data: menuItems, pending, error, refresh } = await useFetch<MenuItem[]>(
 										type="submit"
 										class="text-white hover:bg-zinc-700 cursor-pointer focus:outline-none bg-zinc-900 w-8 h-8 rounded-full justify-center flex items-center"
 										aria-label="Search"
-                                        @click="increaseOrDecreaseCounter('decrease')"
+										@click="increaseOrDecreaseCounter('decrease')"
 									>
 										<Minus />
 									</button>
 
-									<input class="flex items-center text-center" v-model="count" />
+									<input
+										v-model="count"
+										class="flex items-center text-center"
+									>
 
 									<button
 										type="submit"
 										class="text-white hover:bg-zinc-700 cursor-pointer focus:outline-none bg-zinc-900 w-8 h-8 rounded-full justify-center flex items-center"
 										aria-label="Search"
-                                        @click="increaseOrDecreaseCounter('increase')"
+										@click="increaseOrDecreaseCounter('increase')"
 									>
 										<Plus />
 									</button>
