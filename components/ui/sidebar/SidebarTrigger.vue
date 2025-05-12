@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 const props = defineProps<{
 	class?: HTMLAttributes["class"];
 	icon?: LucideIcon;
+	iconSize?: number;
 }>();
 
 const { toggleSidebar } = useSidebar();
@@ -24,6 +25,7 @@ const { toggleSidebar } = useSidebar();
 	>
 		<component
 			:is="props.icon || PanelLeft"
+			:class="iconSize ? `size-${props.iconSize}` : ''"
 		/>
 		<span class="sr-only">Toggle Sidebar</span>
 	</Button>
