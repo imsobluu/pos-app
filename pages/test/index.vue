@@ -1,27 +1,11 @@
+<script setup lang="ts">
+import NavBar from "@/components/navigation/NavBar.vue";
+</script>
+
 <template>
 	<div class="h-full w-full flex flex-row">
 		<div class="flex flex-col flex-1">
-			<div class="flex items-center justify-between h-[60px] px-4">
-				<div class="flex flex-row gap-4">
-					<div class="">
-						<shadcnSidebarTrigger />
-					</div>
-					<div class="">
-						Date
-					</div>
-					<div>
-						-
-					</div>
-					<div>
-						Time
-					</div>
-				</div>
-				<div class="flex flex-row gap-4">
-					<div>
-						Close Order
-					</div>
-				</div>
-			</div>
+			<NavBar variant="order" />
 			<div class="flex flex-1 justify-center items-center">
 				Content
 			</div>
