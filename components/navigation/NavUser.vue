@@ -55,7 +55,7 @@ const { isMobile } = useSidebar();
 								:alt="props.user.name"
 							/>
 							<AvatarFallback class="rounded-lg">
-								CN
+								{{ props.user.name.charAt(0) }}
 							</AvatarFallback>
 						</Avatar>
 						<div class="grid flex-1 text-left text-sm leading-tight">

@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { Settings, TrendingUp, ChartPie, Boxes, UsersRound, Store, X, LogOut } from "lucide-vue-next";
-import NavUser from "@/components/NavUser.vue";
+import NavUser from "@/components/navigation/NavUser.vue";
 import {
 	Sidebar,
+	SidebarHeader,
 	SidebarContent,
 	SidebarFooter,
-	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
 	type SidebarProps,
 	SidebarRail,
+	SidebarGroup,
+	SidebarGroupContent,
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
 
@@ -25,7 +27,7 @@ const data = {
 	items: [
 		{
 			title: "Point of Sales",
-			url: "/pos",
+			url: "/order",
 			icon: Store,
 		},
 		{
