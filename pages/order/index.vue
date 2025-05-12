@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { Search, Minus, Plus } from "lucide-vue-next";
+import { ref } from "vue";
+import { useFetch } from "nuxt/app";
 import { ShadcnCard, ShadcnCardFooter, ShadcnCardHeader, ShadcnCardTitle } from "#components";
+import NavBar from "@/components/navigation/NavBar.vue";
 import {
 	Select,
 	SelectContent,
@@ -53,105 +56,120 @@ function openMenuItemDialog(item: MenuItem) {
 }
 
 const { data: menuItems, pending, error, refresh } = await useFetch<MenuItem[]>("https://free-food-menus-api-two.vercel.app/best-foods");
+
+console.log("menu: ", menuItems.value);
+
+const handleImageError = (event: Event) => {
+	const img = event.target as HTMLImageElement;
+	img.src = "/placeholder.svg";
+};
 </script>
 
 <template>
 	<main
 		class="grid grid-cols-[75%_25%] overflow-hidden h-dvh pl-8"
 	>
-		<article
-			class="px-2"
-			style="padding-top: 48px;"
-		>
-			<!-- Menu type -->
-			<div class="menu-list-wrapper flex overflow-x-auto gap-2">
-				<ShadcnCard
-					v-for="(item, index) in menuItems"
-					:key="index"
-					class="bg-zinc-900"
-				>
-					<div class="flex flex-col justify-between w-40 m">
-						<div>
-							<ShadcnCardHeader>
-								<div class="overflow-hidden rounded-lg bg-zinc-800">
-									<img
-										src=""
-										alt=""
-										class="w-full h-full object-cover"
-									>
-								</div>
-							</ShadcnCardHeader>
-							<ShadcnCardHeader>
-								<ShadcnCardTitle>All Menu</ShadcnCardTitle>
-							</ShadcnCardHeader>
-						</div>
-
-						<div>
-							<ShadcnCardFooter>
-								<p class="text-xs">
-									110 Items
-								</p>
-							</ShadcnCardFooter>
-						</div>
-					</div>
-				</ShadcnCard>
-			</div>
-
-			<!-- Search bar -->
-			<div class="search-bar-wrapper py-5">
-				<div class="relative">
-					<input
-						id="search-bar"
-						name="search"
-						type="search"
-						placeholder="Search your dish"
-						class="w-full rounded-full border border-zinc-800 bg-zinc-900 py-3 px-6 pr-14 text-white placeholder-gray-300 text-base font-normal font-sans focus:outline-none focus:ring-2 focus:ring-blue-600"
-					>
-					<button
-						type="submit"
-						class="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-zinc-700 cursor-pointer focus:outline-none bg-zinc-800 w-8 h-8 rounded-full justify-center flex items-center"
-						aria-label="Search"
-					>
-						<Search />
-					</button>
-				</div>
-			</div>
-
-			<!-- Menu list -->
-			<div
-				class="menu-list-wrapper grid gap-4 overflow-y-auto h-dvh [grid-template-columns:repeat(auto-fit,_minmax(250px,_1fr))]"
+		<div>
+			<NavBar variant="order" />
+			<article
+				class="px-2"
 			>
-				<ShadcnCard
-					v-for="(item, index) in menuItems"
-					:key="index"
-					class="bg-zinc-900"
-					@click="openMenuItemDialog(item)"
-				>
-					<div class="flex flex-col justify-between">
-						<div>
-							<ShadcnCardHeader>
-								<div class="w-full h-40 overflow-hidden rounded-lg bg-zinc-800">
-									<img
-										:src="item.img"
-										alt=""
-										class="w-full h-full object-cover"
-									>
-								</div>
-							</ShadcnCardHeader>
-							<ShadcnCardHeader>
-								<ShadcnCardTitle>{{ item.name }}</ShadcnCardTitle>
-							</ShadcnCardHeader>
-						</div>
+				<!-- Menu type -->
+				<div class="menu-list-wrapper flex overflow-x-auto gap-2 no-scrollbar">
+					<ShadcnCard
+						v-for="(item, index) in menuItems"
+						:key="index"
+						class="bg-zinc-900"
+					>
+						<div class="flex flex-col justify-between w-40 m">
+							<div>
+								<ShadcnCardHeader>
+									<div class="overflow-hidden rounded-lg bg-zinc-800">
+										<client-only>
+											<img
+												:src="item.img || '/placeholder.svg'"
+												alt=""
+												class="w-full h-full object-cover"
+												@error="handleImageError"
+											>
+										</client-only>
+									</div>
+								</ShadcnCardHeader>
+								<ShadcnCardHeader>
+									<ShadcnCardTitle>{{ item.name }}</ShadcnCardTitle>
+								</ShadcnCardHeader>
+							</div>
 
-						<div>
-							<ShadcnCardFooter style="justify-content: end;">
-								<p class="text-xl">
-									{{ item.price }} ฿
-								</p>
-							</ShadcnCardFooter>
+							<div>
+								<ShadcnCardFooter>
+									<p class="text-xs">
+										{{ menuItems ? menuItems.length : 0 }} Items
+									</p>
+								</ShadcnCardFooter>
+							</div>
 						</div>
+					</ShadcnCard>
+				</div>
+
+				<!-- Search bar -->
+				<div class="search-bar-wrapper py-5">
+					<div class="relative">
+						<input
+							id="search-bar"
+							name="search"
+							type="search"
+							placeholder="Search your dish"
+							class="w-full rounded-full border border-zinc-800 bg-zinc-900 py-3 px-6 pr-14 text-white placeholder-gray-300 text-base font-normal font-sans focus:outline-none focus:ring-2 focus:ring-blue-600"
+						>
+						<button
+							type="submit"
+							class="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-zinc-700 cursor-pointer focus:outline-none bg-zinc-800 w-8 h-8 rounded-full justify-center flex items-center"
+							aria-label="Search"
+						>
+							<Search />
+						</button>
 					</div>
-				</ShadcnCard>
+				</div>
+
+				<!-- Menu list -->
+				<div
+					class="menu-list-wrapper grid gap-4 overflow-y-auto h-dvh [grid-template-columns:repeat(auto-fit,_minmax(250px,_1fr))]"
+				>
+					<ShadcnCard
+						v-for="(item, index) in menuItems"
+						:key="index"
+						class="bg-zinc-900"
+						@click="openMenuItemDialog(item)"
+					>
+						<div class="flex flex-col justify-between">
+							<div>
+								<ShadcnCardHeader>
+									<div class="w-full h-40 overflow-hidden rounded-lg bg-zinc-800">
+										<client-only>
+											<img
+												:src="item.img || '/placeholder.svg'"
+												alt=""
+												class="w-full h-full object-cover"
+												@error="handleImageError"
+											>
+										</client-only>
+									</div>
+								</ShadcnCardHeader>
+								<ShadcnCardHeader>
+									<ShadcnCardTitle>{{ item.name }}</ShadcnCardTitle>
+								</ShadcnCardHeader>
+							</div>
+
+							<div>
+								<ShadcnCardFooter class="flex justify-end">
+									<p class="text-xl">
+										{{ item.price }} ฿
+									</p>
+								</ShadcnCardFooter>
+							</div>
+						</div>
+					</ShadcnCard>
+				</div>
 
 				<Dialog v-model:open="isDialogOpen">
 					<DialogContent class="sm:max-w-[425px] p-0 overflow-hidden">
@@ -163,11 +181,14 @@ const { data: menuItems, pending, error, refresh } = await useFetch<MenuItem[]>(
 							</DialogHeader>
 							<div>
 								<div class="my-4 w-full h-60 overflow-hidden rounded-lg bg-zinc-800">
-									<img
-										:src="selectedMenuItem?.img"
-										alt=""
-										class="w-full h-full object-cover"
-									>
+									<client-only>
+										<img
+											:src="selectedMenuItem?.img || '/placeholder.svg'"
+											alt=""
+											class="w-full h-full object-cover"
+											@error="handleImageError"
+										>
+									</client-only>
 								</div>
 
 								<div>
@@ -221,8 +242,8 @@ const { data: menuItems, pending, error, refresh } = await useFetch<MenuItem[]>(
 						</DialogFooter>
 					</DialogContent>
 				</Dialog>
-			</div>
-		</article>
+			</article>
+		</div>
 
 		<aside class="bg-zinc-900 h-dvh flex flex-col justify-between">
 			<div class="py-4">
@@ -305,5 +326,12 @@ const { data: menuItems, pending, error, refresh } = await useFetch<MenuItem[]>(
 <style scoped>
 .menu-list-wrapper {
     scrollbar-width: thin;
+}
+.no-scrollbar {
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
 }
 </style>
