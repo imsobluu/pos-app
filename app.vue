@@ -1,10 +1,15 @@
+<script setup lang="ts">
+import AppSidebar from "@/components/navigation/AppSidebar.vue";
+import SidebarProvider from "@/components/ui/sidebar/SidebarProvider.vue";
+</script>
+
 <template>
 	<NuxtUIApp>
-		<shadcnSidebarProvider :force-mobile="true">
+		<SidebarProvider :force-mobile="true">
 			<AppSidebar />
 			<NuxtLayout>
 				<NuxtPage />
 			</NuxtLayout>
-		</shadcnSidebarProvider>
+		</SidebarProvider>
 	</NuxtUIApp>
 </template>

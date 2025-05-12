@@ -9,6 +9,9 @@ export default defineNuxtConfig({
 		"@nuxt/fonts",
 		"shadcn-nuxt",
 	],
+	imports: {
+		autoImport: false,
+	},
 	devtools: { enabled: true },
 	css: ["@/assets/css/main.css"],
 	ui: {
