@@ -23,9 +23,10 @@ const props = withDefaults(defineProps<{
 </script>
 
 <template>
+	<!-- Order -->
 	<div
 		v-if="props.variant === 'order'"
-		class="flex items-center justify-between h-[60px] px-4"
+		class="flex items-center justify-between h-[60px] w-full px-4"
 	>
 		<div class="flex flex-row items-center gap-4">
 			<div class="bg-accent/50 dark:hover:bg-accent rounded-full">
@@ -77,9 +78,10 @@ const props = withDefaults(defineProps<{
 		</div>
 	</div>
 
+	<!-- Activity -->
 	<div
 		v-else-if="props.variant === 'activity'"
-		class="flex items-center justify-between h-[60px] px-4"
+		class="flex items-center justify-between h-[60px] w-full px-4"
 	>
 		<div class="flex flex-row items-center gap-4">
 			<div class="bg-accent/50 dark:hover:bg-accent rounded-full">
@@ -156,9 +158,10 @@ const props = withDefaults(defineProps<{
 		</div>
 	</div>
 
+	<!-- Report -->
 	<div
 		v-else-if="props.variant === 'report'"
-		class="flex items-center justify-between h-[60px] px-4"
+		class="flex items-center justify-between h-[60px] w-full px-4"
 	>
 		<div class="flex flex-row items-center gap-4">
 			<div class="bg-accent/50 dark:hover:bg-accent rounded-full">
