@@ -2,7 +2,12 @@
 import { Search, Minus, Plus } from "lucide-vue-next";
 import { ref } from "vue";
 import { useFetch } from "nuxt/app";
-import { ShadcnCard, ShadcnCardFooter, ShadcnCardHeader, ShadcnCardTitle } from "#components";
+import {
+	Card,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 import NavBar from "@/components/navigation/NavBar.vue";
 import {
 	Select,
@@ -57,8 +62,6 @@ function openMenuItemDialog(item: MenuItem) {
 
 const { data: menuItems, pending, error, refresh } = await useFetch<MenuItem[]>("https://free-food-menus-api-two.vercel.app/best-foods");
 
-console.log("menu: ", menuItems.value);
-
 const handleImageError = (event: Event) => {
 	const img = event.target as HTMLImageElement;
 	img.src = "/placeholder.svg";
@@ -76,14 +79,14 @@ const handleImageError = (event: Event) => {
 			>
 				<!-- Menu type -->
 				<div class="menu-list-wrapper flex overflow-x-auto gap-2 no-scrollbar">
-					<ShadcnCard
+					<Card
 						v-for="(item, index) in menuItems"
 						:key="index"
 						class="bg-zinc-900"
 					>
 						<div class="flex flex-col justify-between w-40 m">
 							<div>
-								<ShadcnCardHeader>
+								<CardHeader>
 									<div class="overflow-hidden rounded-lg bg-zinc-800">
 										<client-only>
 											<img
@@ -94,21 +97,21 @@ const handleImageError = (event: Event) => {
 											>
 										</client-only>
 									</div>
-								</ShadcnCardHeader>
-								<ShadcnCardHeader>
-									<ShadcnCardTitle>{{ item.name }}</ShadcnCardTitle>
-								</ShadcnCardHeader>
+								</CardHeader>
+								<CardHeader>
+									<CardTitle>{{ item.name }}</CardTitle>
+								</CardHeader>
 							</div>
 
 							<div>
-								<ShadcnCardFooter>
+								<CardFooter>
 									<p class="text-xs">
 										{{ menuItems ? menuItems.length : 0 }} Items
 									</p>
-								</ShadcnCardFooter>
+								</CardFooter>
 							</div>
 						</div>
-					</ShadcnCard>
+					</Card>
 				</div>
 
 				<!-- Search bar -->
@@ -135,7 +138,7 @@ const handleImageError = (event: Event) => {
 				<div
 					class="menu-list-wrapper grid gap-4 overflow-y-auto h-dvh [grid-template-columns:repeat(auto-fit,_minmax(250px,_1fr))]"
 				>
-					<ShadcnCard
+					<Card
 						v-for="(item, index) in menuItems"
 						:key="index"
 						class="bg-zinc-900"
@@ -143,7 +146,7 @@ const handleImageError = (event: Event) => {
 					>
 						<div class="flex flex-col justify-between">
 							<div>
-								<ShadcnCardHeader>
+								<CardHeader>
 									<div class="w-full h-40 overflow-hidden rounded-lg bg-zinc-800">
 										<client-only>
 											<img
@@ -154,21 +157,21 @@ const handleImageError = (event: Event) => {
 											>
 										</client-only>
 									</div>
-								</ShadcnCardHeader>
-								<ShadcnCardHeader>
-									<ShadcnCardTitle>{{ item.name }}</ShadcnCardTitle>
-								</ShadcnCardHeader>
+								</CardHeader>
+								<CardHeader>
+									<CardTitle>{{ item.name }}</CardTitle>
+								</CardHeader>
 							</div>
 
 							<div>
-								<ShadcnCardFooter class="flex justify-end">
+								<CardFooter class="flex justify-end">
 									<p class="text-xl">
 										{{ item.price }} ฿
 									</p>
-								</ShadcnCardFooter>
+								</CardFooter>
 							</div>
 						</div>
-					</ShadcnCard>
+					</Card>
 				</div>
 
 				<Dialog v-model:open="isDialogOpen">
