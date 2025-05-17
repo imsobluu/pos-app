@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ClipboardList, Pencil, ChevronDown, BadgePercent } from "lucide-vue-next";
-import { useFetch } from "nuxt/app";
+
+// import { useFetch } from "nuxt/app";
+
 import { computed } from "vue";
+
 import { Button } from "@/components/ui/button";
 import {
 	NumberField,
@@ -10,81 +13,33 @@ import {
 	NumberFieldIncrement,
 	NumberFieldInput,
 } from "@/components/ui/number-field";
-
 import { Separator } from "@/components/ui/separator";
 
-interface MenuItem {
-	id: string;
-	img: string;
-	name: string;
-	dsc: string;
-	price: number;
-	rate: number;
-	country: string;
-}
+import type { CartItem } from '@/utils/order';
+import { handleImageError } from '@/utils/handleImageError';
 
-const { data: menuImages, pending, error, refresh } = await useFetch<MenuItem[]>("https://free-food-menus-api-two.vercel.app/desserts");
+const props = defineProps<{ cart: CartItem[] }>()
 
-const menuItems = [
-	{
-		name: "Beef Crowich",
-		price: 5.50,
-		amount: 1,
-		img: menuImages.value?.[0]?.img || "/placeholder.svg",
-	},
-	{
-		name: "Sliced Black Forest",
-		price: 5.00,
-		amount: 2,
-		img: menuImages.value?.[3]?.img || "/placeholder.svg",
-	},
-	{
-		name: "Solo Floss Bread",
-		price: 4.50,
-		amount: 1,
-		img: menuImages.value?.[2]?.img || "/placeholder.svg",
-	},
-	// {
-	// 	name: "Beef Crowich",
-	// 	price: 5.50,
-	// 	amount: 1,
-	// 	img: menuImages.value?.[0]?.img || "/placeholder.svg",
-	// },
-	// {
-	// 	name: "Sliced Black Forest",
-	// 	price: 5.00,
-	// 	amount: 2,
-	// 	img: menuImages.value?.[3]?.img || "/placeholder.svg",
-	// },
-	// {
-	// 	name: "Solo Floss Bread",
-	// 	price: 4.50,
-	// 	amount: 1,
-	// 	img: menuImages.value?.[2]?.img || "/placeholder.svg",
-	// },
-];
+// const { data: menuImages, pending, error, refresh } = await useFetch<MenuItem[]>("https://free-food-menus-api-two.vercel.app/desserts");
+
+const numberFormatter = new Intl.NumberFormat('th-TH', { style: 'decimal', minimumFractionDigits: 2 });
 
 const subtotal = computed(() =>
-	menuItems.reduce((acc, item) => acc + item.price * item.amount, 0),
+	props.cart.reduce((acc, item) => acc + item.price * item.amount, 0),
 );
 
 const tax = computed(() => subtotal.value * 0.1);
-const discount = computed(() => 1.0); // You can make this dynamic if needed
+const discount = computed(() => 0.0); // You can make this dynamic if needed
 
 const total = computed(() =>
 	subtotal.value + tax.value - discount.value,
 );
-
-const handleImageError = (event: Event) => {
-	const img = event.target as HTMLImageElement;
-	img.src = "/placeholder.svg";
-};
 </script>
 
 <template>
 	<div class="flex flex-col h-full flex-1">
 		<!-- Header -->
-		<div class="flex w-full h-[60px] justify-between items-center">
+		<div class="flex w-full h-[60px] justify-between items-center px-2">
 			<Button
 				variant="ghost"
 				size="icon"
@@ -112,7 +67,7 @@ const handleImageError = (event: Event) => {
 		</div>
 
 		<!-- Table and Dine In -->
-		<div class="flex w-full items-center gap-2">
+		<div class="flex w-full items-center gap-2 px-2">
 			<Button
 				variant="ghost"
 				size="icon"
@@ -140,15 +95,15 @@ const handleImageError = (event: Event) => {
 		</div>
 
 		<!-- Main Content -->
-		<div class="flex flex-col flex-1 w-full justify-between items-center min-h-0 gap-16">
+		<div class="flex flex-col flex-1 w-full justify-between items-center min-h-0 gap-1">
 			<!-- Menu Items -->
-			<div class="flex flex-col flex-2 w-full justify-start items-center overflow-y-auto">
+			<div class="flex flex-col flex-2 w-full justify-start items-center overflow-y-auto px-2">
 				<div
-					v-for="(item, index) in menuItems"
+					v-for="(item, index) in cart"
 					:key="index"
 					class="w-full pt-4"
 				>
-					<div class="flex flex-row w-full h-[120px] gap-4">
+					<div class="flex flex-row w-full h-[80px] gap-4">
 						<div class="flex-1">
 							<client-only>
 								<img
@@ -165,7 +120,7 @@ const handleImageError = (event: Event) => {
 									{{ item.name }}
 								</div>
 								<div>
-									${{ item.price.toFixed(2) }}
+									{{ item.price.toFixed(2) }} ฿
 								</div>
 							</div>
 							<div class="flex justify-between">
@@ -190,7 +145,7 @@ const handleImageError = (event: Event) => {
 						</div>
 					</div>
 					<Separator
-						v-if="index !== menuItems.length - 1"
+						v-if="index !== cart.length - 1"
 						class="border-t-2 border-dashed border-border bg-transparent mt-4"
 					/>
 				</div>
@@ -199,62 +154,62 @@ const handleImageError = (event: Event) => {
 			<!-- Order Summary -->
 			<div class="flex flex-col flex-1 w-full">
 				<!-- Subtotal -->
-				<div class="flex flex-row w-full justify-between items-center text-lg">
+				<div class="flex flex-row w-full justify-between items-center text-lg px-2">
 					<div class="flex-1">
 						Subtotal
 					</div>
 					<div class="flex-1 text-end">
-						$
+						฿
 					</div>
 					<div class="flex-1 text-end">
-						{{ subtotal.toFixed(2) }}
+						{{ numberFormatter.format(subtotal) }}
 					</div>
 				</div>
 
 				<!-- Tax -->
-				<div class="flex flex-row w-full justify-between items-center text-base text-muted-foreground">
+				<div class="flex flex-row w-full justify-between items-center text-base text-muted-foreground  px-2">
 					<div class="flex-1">
 						Tax (10%)
 					</div>
 
 					<div class="flex-1 text-end">
-						$
+						฿
 					</div>
 					<div class="flex-1 text-end">
-						{{ tax.toFixed(2) }}
+						{{ numberFormatter.format(tax) }}
 					</div>
 				</div>
 
 				<!-- Discount -->
-				<div class="flex flex-row w-full justify-between items-center text-base text-success">
+				<div class="flex flex-row w-full justify-between items-center text-base text-success px-2">
 					<div class="flex-1">
 						Discount
 					</div>
 					<div class="flex-1 text-end">
-						-$
+						-฿
 					</div>
 					<div class="flex-1 text-end">
-						{{ discount.toFixed(2) }}
+						{{ numberFormatter.format(discount) }}
 					</div>
 				</div>
 
 				<Separator class="border-t-2 border-dashed border-border bg-transparent my-4" />
 
 				<!-- Total -->
-				<div class="flex flex-row w-full justify-between items-center text-xl">
+				<div class="flex flex-row w-full justify-between items-center text-xl px-2">
 					<div class="flex-1">
 						TOTAL
 					</div>
 					<div class="flex-1 text-end">
-						$
+						฿
 					</div>
 					<div class="flex-1 text-end">
-						{{ total.toFixed(2) }}
+						{{ numberFormatter.format(total) }}
 					</div>
 				</div>
 
 				<!-- Promo and QRIS -->
-				<div class="flex w-full items-center gap-2 mt-8 mb-4">
+				<div class="flex w-full items-center gap-2 mt-8 mb-4 px-2">
 					<Button
 						variant="ghost"
 						size="icon"

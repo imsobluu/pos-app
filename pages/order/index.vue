@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { Search, Minus, Plus } from "lucide-vue-next";
+import { Search } from "lucide-vue-next";
+
 import { ref } from "vue";
+
 import { useFetch } from "nuxt/app";
+
 import {
 	Card,
 	CardFooter,
@@ -9,73 +12,37 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import NavBar from "@/components/navigation/NavBar.vue";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import OrderDetails from "@/components/order/OrderDetails.vue";
+import OrderMenuModal from "@/components/order/OrderMenuModal.vue";
 
-interface MenuItem {
-	id: string;
-	img: string;
-	name: string;
-	dsc: string;
-	price: number;
-	rate: number;
-	country: string;
-}
+import type { MenuItem } from '@/utils/order';
+import { handleImageError } from '@/utils/handleImageError';
 
 const isDialogOpen = ref(false);
-const selectedMenuItem = ref<MenuItem | null>();
-const count = ref(1);
+const selectedMenuItem = ref<MenuItem | null>(null);
+const cart = ref<(MenuItem & { amount: number })[]>([]);
 
-function increaseOrDecreaseCounter(type: "increase" | "decrease") {
-	if (type === "increase") {
-		count.value++;
-	}
-	else {
-		if (count.value > 1) {
-			count.value--;
-		}
-	}
-}
+const { data: menuItems, pending, error, refresh } = await useFetch<MenuItem[]>("https://free-food-menus-api-two.vercel.app/best-foods");
 
 function openMenuItemDialog(item: MenuItem) {
 	selectedMenuItem.value = item;
 	isDialogOpen.value = true;
 }
 
-const { data: menuItems, pending, error, refresh } = await useFetch<MenuItem[]>("https://free-food-menus-api-two.vercel.app/best-foods");
+function handleAddToCart(item: MenuItem, amount: number) {
+	cart.value.push({ ...item, amount });
+}
 
-const handleImageError = (event: Event) => {
-	const img = event.target as HTMLImageElement;
-	img.src = "/placeholder.svg";
-};
 </script>
 
 <template>
 	<main
-		class="grid grid-cols-[75%_25%] overflow-hidden h-dvh pl-8"
+		class="grid grid-cols-[75%_25%] overflow-hidden h-dvh"
 	>
 		<div>
 			<NavBar variant="order" />
 			<article
-				class="px-2"
+				class="px-2 pl-8"
 			>
 				<!-- Menu type -->
 				<div class="menu-list-wrapper flex overflow-x-auto gap-2 no-scrollbar">
@@ -174,154 +141,17 @@ const handleImageError = (event: Event) => {
 					</Card>
 				</div>
 
-				<Dialog v-model:open="isDialogOpen">
-					<DialogContent class="sm:max-w-[425px] p-0 overflow-hidden">
-						<div class="p-6 pb-0">
-							<DialogHeader>
-								<DialogTitle class="text-center">
-									Detail Menu
-								</DialogTitle>
-							</DialogHeader>
-							<div>
-								<div class="my-4 w-full h-60 overflow-hidden rounded-lg bg-zinc-800">
-									<client-only>
-										<img
-											:src="selectedMenuItem?.img || '/placeholder.svg'"
-											alt=""
-											class="w-full h-full object-cover"
-											@error="handleImageError"
-										>
-									</client-only>
-								</div>
-
-								<div>
-									{{ selectedMenuItem?.name }}
-								</div>
-
-								<DialogDescription>
-									{{ selectedMenuItem?.dsc }}
-								</DialogDescription>
-
-								<div class="text-xl text-blue-600 py-2">
-									{{ selectedMenuItem?.price }} ฿
-								</div>
-
-								<div>
-									<Input placeholder="Add notes to order..." />
-								</div>
-
-								<div class="flex justify-between bg-zinc-800 rounded-full p-1 mt-2">
-									<button
-										type="submit"
-										class="text-white hover:bg-zinc-700 cursor-pointer focus:outline-none bg-zinc-900 w-8 h-8 rounded-full justify-center flex items-center"
-										aria-label="Search"
-										@click="increaseOrDecreaseCounter('decrease')"
-									>
-										<Minus />
-									</button>
-
-									<input
-										v-model="count"
-										class="flex items-center text-center"
-									>
-
-									<button
-										type="submit"
-										class="text-white hover:bg-zinc-700 cursor-pointer focus:outline-none bg-zinc-900 w-8 h-8 rounded-full justify-center flex items-center"
-										aria-label="Search"
-										@click="increaseOrDecreaseCounter('increase')"
-									>
-										<Plus />
-									</button>
-								</div>
-							</div>
-						</div>
-						<DialogFooter>
-							<div class="w-full">
-								<button class="w-full bg-blue-600 p-5 hover:bg-blue-700">
-									Add to Cart ({{ selectedMenuItem?.price !== undefined ? (selectedMenuItem?.price * count) : 0 }} ฿)
-								</button>
-							</div>
-						</DialogFooter>
-					</DialogContent>
-				</Dialog>
+				<OrderMenuModal
+					:isDialogOpen="isDialogOpen"
+					:selectedMenuItem="selectedMenuItem"
+					@close="isDialogOpen = false"
+					@addToCart="handleAddToCart"
+				/>
 			</article>
 		</div>
 
 		<aside class="bg-zinc-900 h-dvh flex flex-col justify-between">
-			<div class="py-4">
-				<div class="flex justify-center pb-3">
-					<h1 class="text-xl">
-						Order Number: #000
-					</h1>
-				</div>
-
-				<div class="flex justify-center">
-					<div class="w-[50%] flex justify-center px-2">
-						<Select>
-							<SelectTrigger class="w-[100%]">
-								<SelectValue placeholder="Select Table" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectGroup>
-									<SelectItem value="1">
-										1
-									</SelectItem>
-									<SelectItem value="2">
-										2
-									</SelectItem>
-									<SelectItem value="3">
-										3
-									</SelectItem>
-								</SelectGroup>
-							</SelectContent>
-						</Select>
-					</div>
-
-					<div class="w-[50%] flex justify-center px-2">
-						<Select>
-							<SelectTrigger class="w-[100%]">
-								<SelectValue placeholder="Order Type" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectGroup>
-									<SelectItem value="1">
-										1
-									</SelectItem>
-									<SelectItem value="2">
-										2
-									</SelectItem>
-									<SelectItem value="3">
-										3
-									</SelectItem>
-								</SelectGroup>
-							</SelectContent>
-						</Select>
-					</div>
-				</div>
-			</div>
-
-			<div class="bg-zinc-800 h-full" />
-
-			<div class="total-container">
-				<div class="total-wrapper">
-					<div class="bg-zinc-900 flex justify-between px-4 py-2 border border-t-2 border-dashed border-x-0 border-b-0">
-						<p>Subtotal</p>
-						<p>0.00 ฿</p>
-					</div>
-
-					<div class="bg-zinc-900 flex justify-between px-4 py-2 border border-t-2 border-dashed border-x-0 border-b-0">
-						<p>Total</p>
-						<p>0.00 ฿</p>
-					</div>
-				</div>
-
-				<div class="place-order-wrapper flex justify-center align-bottom">
-					<button class="w-full bg-blue-600 p-5 hover:bg-blue-700">
-						Place Order
-					</button>
-				</div>
-			</div>
+			<OrderDetails :cart="cart" />
 		</aside>
 	</main>
 </template>
